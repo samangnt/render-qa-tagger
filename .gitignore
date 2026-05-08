@@ -4,3 +4,4 @@ __pycache__/
 ngrok.exe
 asset_library.csv
 json_test.py
+.streamlit/
