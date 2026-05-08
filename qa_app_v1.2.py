@@ -16,12 +16,17 @@ st.write("Upload a 3D render to automatically tag and critique it.")
 uploaded_file = st.file_uploader("Upload a Render", type=["png", "jpg", "jpeg"])
 
 #here is the prompt
-prompt ="""Analyze this 3D render and respond in JSON format only.
+prompt = """You are a 3D render analyst. Analyze this image and respond with ONLY a JSON object, no other text.
 
 Use exactly these three keys:
--"Keywords": a list of 5 descriptive tags
--"Lighting_type": a short description of the lighting
--"critique": one sentence on how to improve the composition"""
+{
+    "Keywords": ["tag1", "tag2", "tag3", "tag4", "tag5"],
+    "Lighting_type": "description of lighting",
+    "critique": "one sentence on how to improve composition"
+}
+
+Return ONLY the JSON object, nothing else."""
+
 col1, col2 =st.columns(2)
 
 #check if file is uploaded then read the file and show the uploaded file with caption
@@ -37,7 +42,8 @@ def file_analyzer():
                 image_part = {"mime_type": "image/jpeg", "data": image_bytes}
                 response = model.generate_content([prompt, image_part])
                 raw_json = response.text
-                                
+                st.write("DEBUG:", raw_json)
+                          
                 st.session_state['parsed_data'] = json.loads(raw_json)               
                 parsed_data = st.session_state['parsed_data']
                 
