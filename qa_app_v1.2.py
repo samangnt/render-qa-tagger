@@ -41,9 +41,20 @@ def file_analyzer():
                 model = genai.GenerativeModel('gemini-2.5-flash')
                 image_part = {"mime_type": "image/jpeg", "data": image_bytes}
                 response = model.generate_content([prompt, image_part])
-                raw_json = response.text
-                st.write("DEBUG:", raw_json)
-                          
+
+                # Remove markdown code blocks if present
+                raw_json = raw_json.strip()
+                if raw_json.startswith("```"):
+                    raw_json = raw_json.split("```")[1]
+                    if raw_json.startswith("json"):
+                        raw_json = raw_json[4:]
+
+
+
+
+
+
+
                 st.session_state['parsed_data'] = json.loads(raw_json)               
                 parsed_data = st.session_state['parsed_data']
                 
