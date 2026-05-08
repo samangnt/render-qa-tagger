@@ -70,5 +70,7 @@ def file_analyzer():
 try:
     file_analyzer()
 except Exception as e:
+    if "429" in str(e):
+        st.error("⚠️ Daily limit reached. Please try again tomorrow or contact admin: thegeekntech@gmail.com")
     st.write(f"Something went wrong: {e}")
 
