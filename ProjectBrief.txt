@@ -1,0 +1,22 @@
+The 1-Week Capstone Project: "The Render QA Auto-Tagger"
+Here is your real-world freelance scenario. A mid-sized indie game studio has a folder of thousands of unorganized 3D renders and concept art. They need a tool to organize them.
+
+Your Mission: Build a local Streamlit web app that automatically tags and critiques images.
+
+The Requirements:
+
+The UI: Add an image upload box in Streamlit so the user can upload a .png or .jpg.
+
+The Vision AI: Write Python code that sends the uploaded image to the local llava model.
+
+The Brain: Write a prompt that forces the AI to output a JSON dictionary with three exact things:
+
+keywords: A list of 5 descriptive tags for the asset.
+
+lighting_type: A short description of the lighting setup (e.g., "Studio", "Overcast").
+
+critique: One short sentence on how to improve the render's composition.
+
+The Display: Show the uploaded image on the left side of the screen, and the clean, formatted metadata on the right.
+
+The Database: A "Save to Library" button that writes the JSON data into a master CSV file.

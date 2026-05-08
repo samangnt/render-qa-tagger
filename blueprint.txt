@@ -1,0 +1,8 @@
+1. User opens the app
+2. User uploads an image
+3. App reads the image as raw bytes
+4. App sends bytes + prompt to llava
+5. llava returns JSON string
+6. App parses JSON into a dictionary
+7. App displays image on left, data on right
+8. User clicks "Save to Library" → writes to CSV
