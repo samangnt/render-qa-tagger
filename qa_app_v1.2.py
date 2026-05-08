@@ -41,7 +41,7 @@ def file_analyzer():
                 model = genai.GenerativeModel('gemini-2.5-flash')
                 image_part = {"mime_type": "image/jpeg", "data": image_bytes}
                 response = model.generate_content([prompt, image_part])
-
+                raw_json = response.text
                 # Remove markdown code blocks if present
                 raw_json = raw_json.strip()
                 if raw_json.startswith("```"):
