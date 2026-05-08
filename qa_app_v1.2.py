@@ -33,7 +33,7 @@ def file_analyzer():
                        
         with col2:
             if st.button("🔍 Analyze"):
-                model = genai.GenerativeModel('gemini-1.5-flash')
+                model = genai.GenerativeModel('gemini-2.0-flash')
                 image_part = {"mime_type": "image/jpeg", "data": image_bytes}
                 response = model.generate_content([prompt, image_part])
                 raw_json = response.text
