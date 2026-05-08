@@ -49,12 +49,6 @@ def file_analyzer():
                     if raw_json.startswith("json"):
                         raw_json = raw_json[4:]
 
-
-
-
-
-
-
                 st.session_state['parsed_data'] = json.loads(raw_json)               
                 parsed_data = st.session_state['parsed_data']
                 
