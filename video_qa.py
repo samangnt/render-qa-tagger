@@ -4,9 +4,7 @@ from google import generativeai as genai
 import pandas as pd
 import streamlit as st
 import json
-import datetime
 import tempfile
-import cv2
 
 genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
@@ -190,4 +188,4 @@ if uploaded_video:
                         genai.delete_file(uploaded_gemini_video.name)
 
                     except Exception as ex:
-                        st.error(f"Something went wrong: {ex}")
+                        st.error(f"Something went wrong: {ex} \n contact admin: thegeekntech@gmail.com")
