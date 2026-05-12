@@ -14,7 +14,7 @@ genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 MODELS = [
     'gemini-3.0-flash',
     'gemini-2.5-flash',
-    'gemini-3.0-flash-lite',
+    'gemini-3.1-flash-lite',
     'gemini-2.5-flash-lite'
 ]
 
@@ -23,13 +23,14 @@ You are an elite Technical Animation and Lighting Supervisor. Your job is to per
 
 CRITICAL DIRECTIVE: You must output TEXT ONLY in the requested JSON format. DO NOT generate, output, or attempt to create any video, audio, or image files.
 
-Your primary directive is accuracy. DO NOT hallucinate errors. If you are not 100 percent certain about a technical clipping issue, action mismatch, or lighting artifact due to video resolution or framing, DO NOT flag it. You operate on a "Guilty Beyond a Reasonable Doubt" framework.
+Your primary directive is balanced accuracy. Flag issues you are reasonably confident about and assign each a confidence level: High, Medium, or Low. A "High" confidence flag means you are certain. A "Low" confidence flag means "worth a human second look." Never fabricate issues, but don't stay silent on genuine concerns either.
 
 Evaluate the render against the script based on these four criteria:
 1. Action Verification: Do the physical actions in the render match the explicit script directions?
 2. Timing & Pacing: Does the timing of the actions feel natural and align with the intended flow of the scene?
 3. Lighting & Composition: Does the lighting setup, shadow placement, and camera framing match the requested mood? Detect any sudden lighting pops, missing shadows, or flickers.
 4. Emotional Alignment: Does the character posture and overall atmosphere reflect the intended emotion of the script?
+5. Flag any minor deviations or suggestions for polish, even if they aren't critical errors.
 
 You must output your audit STRICTLY in valid JSON format. Do not include any conversational text before or after the JSON. 
 
@@ -48,7 +49,7 @@ Use the following JSON schema:
 """
 
 # Development mode — uses only one model
-DEV_MODE = True
+DEV_MODE = False
 #this selects the ai model then reads media_part that is video
 
 def get_ai_response(system_prompt, script_payload, media_part):
@@ -64,7 +65,7 @@ def get_ai_response(system_prompt, script_payload, media_part):
     
     # Development — single model only
     if DEV_MODE:
-        model = genai.GenerativeModel(MODELS[2]) 
+        model = genai.GenerativeModel(MODELS[1]) 
         return model.generate_content(request_content)
     
     # Production — fallback chain
@@ -90,8 +91,8 @@ st.write("Upload your 3D render video to automatically tag and critique it again
 
 #1. video Uploader
 uploaded_video = st.file_uploader(
-    "Upload Video (Max 1080p, 30fps, 1min)", 
-    type=["mp4", "mov", "avi", "webm", "wmv"]
+    "Upload Video (Max 1080p, 30fps, 1min) MP4 only", 
+    type=["mp4"]
 )
 
 #2. Script uploader with text area
@@ -116,10 +117,12 @@ st.divider()
 final_script_payload = None
 
 if uploaded_video:
-    col1, col2 = st.columns([2, 1]) # Col 1 is twice as wide as Col 2
+    col1, col2 = st.columns([1, 1]) # Col 1 is twice as wide as Col 2
 
     with col1:
-        st.video(uploaded_video)
+        vid_col, _ = st.columns([1, 2])
+        with vid_col:
+            st.video(uploaded_video)
         # We check the PDF FIRST, because you want to prefer it
         if pdf_file is not None:
             # Package the raw PDF bytes for Gemini
@@ -139,7 +142,7 @@ if uploaded_video:
         st.write("Ready to check your video against the script.")
         
         # The Analyze Button
-        if st.button("🚀 Run Analysis", use_container_width=True):
+        if st.button("🚀 Run Analysis",use_container_width=True):
             if final_script_payload is None:
                 st.error("Please provide a script (Text or PDF) first!")
             else:
