@@ -140,9 +140,51 @@ if uploaded_video:
         
         # The Analyze Button
         if st.button("🚀 Run Analysis", use_container_width=True):
-            if not script_content and not pdf_file:
-                st.error("Please provide a script first!")
+            if final_script_payload is None:
+                st.error("Please provide a script (Text or PDF) first!")
             else:
-                st.info("Sending to Gemini API...")
-                # Your Gemini API Call Logic here
-                get_ai_response(final_script_payload, user_script)
+                with st.spinner("Uploading and analyzing video... This may take a minute."):
+                    try:
+                        # STEP 1: Save the Streamlit video to a temporary file
+                        with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as tmp_video:
+                            tmp_video.write(uploaded_video.read())
+                            video_path = tmp_video.name
+                        
+                        # STEP 2: Upload the video to Google's File API
+                        st.info("Processing video on Google Servers...")
+                        uploaded_gemini_video = genai.upload_file(video_path)
+                        
+                        # STEP 3: Optional (but recommended) - Wait for video to process
+                        # Video processing can take a few seconds on Google's end
+                        import time
+                        while uploaded_gemini_video.state.name == 'PROCESSING':
+                            time.sleep(2)
+                            uploaded_gemini_video = genai.get_file(uploaded_gemini_video.name)
+                        
+                        if uploaded_gemini_video.state.name == 'FAILED':
+                            st.error("Google failed to process the video.")
+                            st.stop()
+
+                        # STEP 4: Call the AI with the correct arguments!
+                        st.info("Running AI Analysis...")
+                        response = get_ai_response(
+                            system_prompt=SYSTEM_PROMPT, 
+                            script_payload=final_script_payload, 
+                            media_part=uploaded_gemini_video
+                        )
+                        
+                        # STEP 5: Parse and display the JSON
+                        raw_json = response.text
+                        # Clean the output just in case Gemini added markdown block tags
+                        raw_json = raw_json.replace("```json", "").replace("```", "").strip()
+                        
+                        parsed_data = json.loads(raw_json)
+                        st.success("Analysis Complete!")
+                        st.json(parsed_data) # Beautifully formats the JSON output in Streamlit
+                        
+                        # STEP 6: Clean up the temporary file and Gemini file
+                        os.remove(video_path)
+                        genai.delete_file(uploaded_gemini_video.name)
+
+                    except Exception as ex:
+                        st.error(f"Something went wrong: {ex}")
