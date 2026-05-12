@@ -5,7 +5,6 @@ import pandas as pd
 import streamlit as st
 import json
 import datetime
-import pypdf
 import tempfile
 import cv2
 
@@ -23,18 +22,18 @@ MODELS = [
 # Development mode — uses only one model
 DEV_MODE = True
 #this selects the ai model then reads image_part from popping a frame from video frame by frame
-def get_ai_response(prompt, image_part):
+def get_ai_response(prompt, pdffile, image_part):
     
     # Development — single model only
     if DEV_MODE:
         model = genai.GenerativeModel(MODELS[2])  # safest/cheapest
-        return model.generate_content([prompt, image_part])
+        return model.generate_content([prompt, pdffile, image_part])
     
     # Production — fallback chain
     for model_name in MODELS:
         try:
             model = genai.GenerativeModel(model_name)
-            response = model.generate_content([prompt, image_part])
+            response = model.generate_content([prompt, pdffile, image_part])
             st.caption(f"⚡ Powered by {model_name}")
             return response
         except Exception as e:
@@ -93,7 +92,7 @@ if uploaded_video:
         
         # The Analyze Button
         if st.button("🚀 Run Analysis", use_container_width=True):
-            if not script_content:
+            if not script_content and not pdf_file:
                 st.error("Please provide a script first!")
             else:
                 st.info("Sending to Gemini API...")
