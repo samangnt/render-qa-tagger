@@ -1,7 +1,5 @@
 import os
-import io
 from google import generativeai as genai
-import pandas as pd
 import streamlit as st
 import json
 import tempfile
@@ -189,3 +187,4 @@ if uploaded_video:
 
                     except Exception as ex:
                         st.error(f"Something went wrong: {ex} \n contact admin: thegeekntech@gmail.com")
+
